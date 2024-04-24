@@ -2,9 +2,6 @@ import * as fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 
-// contacts.js
-
-// Розкоментуй і запиши значення
 const contactsPath = path.resolve("db", "contacts.json");
 
 async function readContacts() {
@@ -55,9 +52,27 @@ async function addContact(name, email, phone) {
     return newContact;
 }
 
+async function updateContact(contactId, data) {
+    const contacts = await listContacts();
+    const index = contacts.findIndex((contact) => contact.id === contactId);
+  
+    if (index === -1) {
+      return null;
+    }
+
+    const updatedContact = { ...contacts[index], ...data };
+    contacts[index] = updatedContact;
+    await writeContacts(contacts);
+
+    return updatedContact;
+  }
+
 export default {
+    readContacts,
+    writeContacts,
     listContacts,
     getContactById,
     addContact,
     removeContact,
+    updateContact,
 };
