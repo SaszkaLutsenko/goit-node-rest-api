@@ -14,7 +14,7 @@ export const getOneContact = async (req, res) => {
     if(!contact){
         return res.status(404).json({message: HttpError(404).message});
     }
-    res.status(201).json(contact);
+    res.status(200).json(contact);
 };
 
 export const deleteContact = async (req, res) => {const {id} = req.params;
@@ -22,7 +22,7 @@ export const deleteContact = async (req, res) => {const {id} = req.params;
     if(!contact){
         return res.status(404).json({message: HttpError(404).message});
     }
-    res.status(201).json(contact);
+    res.status(200).json(contact);
 };
 
 export const createContact = async (req, res) => {
@@ -32,12 +32,12 @@ export const createContact = async (req, res) => {
 };
 
 export const updateContact = async (req, res)  => {
-    const {id} = req.params;
-    const contact = await contactsService.updateContact(id);
+    const {name, email, phone} = req.body;
+    const contact = await contactsService.updateContact(name, email, phone);
     if(!contact){
         return res.status(404).json({message: HttpError(404).message});
     }
-    res.status(201).json(contact);
+    res.status(200).json(contact);
     
 
 
