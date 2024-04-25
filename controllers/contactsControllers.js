@@ -5,7 +5,7 @@ import HttpError from "../helpers/HttpError.js"
 
 export const getAllContacts = async (req, res) => {
     const contact = await contactsService.listContacts();
-    res.json(contact);
+    res.status(201).json(contact);
 };
 
 export const getOneContact = async (req, res) => {
@@ -14,7 +14,7 @@ export const getOneContact = async (req, res) => {
     if(!contact){
         return res.status(404).json({message: HttpError(404).message});
     }
-    res.json(contact);
+    res.status(201).json(contact);
 };
 
 export const deleteContact = async (req, res) => {const {id} = req.params;
@@ -22,7 +22,8 @@ export const deleteContact = async (req, res) => {const {id} = req.params;
     if(!contact){
         return res.status(404).json({message: HttpError(404).message});
     }
-    res.json(contact);};
+    res.status(201).json(contact);
+};
 
 export const createContact = async (req, res) => {
     const {name, email, phone } = req.body;
@@ -36,7 +37,7 @@ export const updateContact = async (req, res)  => {
     if(!contact){
         return res.status(404).json({message: HttpError(404).message});
     }
-    res.json(contact);
+    res.status(201).json(contact);
     
 
 
