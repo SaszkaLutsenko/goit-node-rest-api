@@ -37,4 +37,7 @@ export const updateContact = async (req, res)  => {
         return res.status(404).json({message: HttpError(404).message});
     }
     res.json(contact);
+    
+
+
 };

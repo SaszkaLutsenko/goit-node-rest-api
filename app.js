@@ -2,7 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 
-import contactsRouter from "./routes/contactsRouter.js";
+import contactsRouter from "./routes/contactsRouters.js";
 
 const app = express();
 

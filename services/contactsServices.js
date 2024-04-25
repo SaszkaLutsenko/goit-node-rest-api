@@ -52,7 +52,7 @@ async function addContact(name, email, phone) {
     return newContact;
 }
 
-async function updateContact(contactId, data) {
+async function updateContact(contactId, contact) {
     const contacts = await listContacts();
     const index = contacts.findIndex((contact) => contact.id === contactId);
   
@@ -60,12 +60,27 @@ async function updateContact(contactId, data) {
       return null;
     }
 
-    const updatedContact = { ...contacts[index], ...data };
-    contacts[index] = updatedContact;
+    const newContact = { ...contact, contactId };
+    const newContacts = [
+        ...contact.slice(0, index),
+        newContact,
+        ...contact.slice(index + 1),
+    ];
+    await writeContacts(newContacts);
+
+    return newContact;
+  }
+
+async function createContact(contact) {
+    const contacts = await readContacts();
+    const newContact = {...contact, id: crypto.randomUUID()}
+
+    contacts.push(newContact);
+
     await writeContacts(contacts);
 
-    return updatedContact;
-  }
+    return newContact;
+}
 
 export default {
     readContacts,
@@ -75,4 +90,5 @@ export default {
     addContact,
     removeContact,
     updateContact,
+    createContact,
 };
