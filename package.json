@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/SaszkaLutsenko/goit-node-rest-api/issues"
   },
-  "homepage": "https://github.com/SaszkaLutsenko/goit-node-rest-api#readme"
+  "homepage": "https://github.com/SaszkaLutsenko/goit-node-rest-api#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0"
+  }
 }
