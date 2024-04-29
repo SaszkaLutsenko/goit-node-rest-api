@@ -13,5 +13,5 @@ export const updateContactSchema = Joi.object({
     email: Joi.string(),
     phone: Joi.string()
     .pattern(/^\(\d{3}\) \d{3}-\d{4}$/),
-})
+}).min(1).message("Body must have at least one field")
 
