@@ -82,3 +82,26 @@ export const updateContact = async (req, res, next)  => {
     }
 };
 
+export const updateFavoritContact = async (req, res, next)  => {
+    const {id} = req.params;
+    const contact = {
+        name: req.body.name,
+        email: req.body.email,   
+        phone: req.body.phone,
+    }
+    try {
+        const {error} = updateFavoriteContactShema.validate(contact);
+        if(error){
+            throw HttpError(400, error.message);
+        }; 
+        
+        const result = await Contact.findByIdAndUpdate(id, contact, {new: true});
+        if(result === null){
+            throw HttpError(400, error.message);
+        };
+        res.status(201).send(result);
+    } catch(error){
+        next(error);
+    }
+};
+
