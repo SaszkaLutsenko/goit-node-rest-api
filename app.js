@@ -1,11 +1,11 @@
 import 'dotenv/config';
-
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
-
 import contactsRouter from "./routes/contactsRouters.js";
+import userRouter from './routes/auth.js';
+import authMiddleware from "./middleware/auth.js";
 import "./db/db.js";
 
 const app = express();
@@ -15,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
+app.use("/users", userRouter);
 
 const DB_URI = process.env.DB_URI;
 
