@@ -5,7 +5,8 @@ import { Contact, createContactSchema, updateContactSchema, updateFavoriteContac
 
 export const getAllContacts = async (req, res, next ) => {
     try {
-        const contact = await Contact.find({ownerId: req.user.id});
+        
+        const contact = await Contact.find({owner: req.user.id});
 
         if (!contact) throw HttpError(404);
 
@@ -18,10 +19,8 @@ export const getAllContacts = async (req, res, next ) => {
 
 export const getOneContact = async (req, res, next) => {
     try {
-        const contactId = req.params.id;
-        const ownerId = req.user.id;
    
-        const contact = await Contact.findOne({_id: contactId, ownerId: ownerId});
+        const contact = await Contact.findOne({_id: req.params.id, owner: req.user.id});
 
         if(!contact) throw HttpError(404, "Not found");
         
@@ -34,9 +33,8 @@ export const getOneContact = async (req, res, next) => {
 
 export const deleteContact = async (req, res, next) => {
     try {
-        const contactId = req.params.id;
-        const ownerId = req.user.id;
-        const contact = await Contact.findOneAndDelete({_id: contactId, ownerId: ownerId})
+       
+        const contact = await Contact.findOneAndDelete({_id: req.params.id, owner: req.user.id})
 
     if(!contact) throw HttpError(404, "Not found");
 
@@ -51,7 +49,7 @@ export const createContact = async (req, res, next) => {
         name: req.body.name,
         email: req.body.email,   
         phone: req.body.phone,
-        ownerId: req.user.id,
+        owner: req.user.id,
     }
     try {
         const {error} = createContactSchema.validate(contact);
@@ -65,19 +63,19 @@ export const createContact = async (req, res, next) => {
 };
 
 export const updateContact = async (req, res, next)  => {
-    const contactId = req.params.id;
+    
     const contact = {
         name: req.body.name,
         email: req.body.email,   
         phone: req.body.phone,
-        ownerId: req.user.id,
+        owner: req.user.id,
     }
     try {
         const {error} = updateContactSchema.validate(contact);
         if(error) throw HttpError(400, error.message);
         
         
-        const result = await Contact.findOneAndUpdate({ _id: contactId, ownerId: req.user.id }, contact, { new: true });
+        const result = await Contact.findOneAndUpdate({ _id: req.params.id }, contact, { new: true });
         if(!result) throw HttpError(400, error.message);
       
         
@@ -88,12 +86,12 @@ export const updateContact = async (req, res, next)  => {
 };
 
 export const updateFavoritContact = async (req, res, next)  => {
-    const contactId = req.params.id;
+   
     const contact = {
         name: req.body.name,
         email: req.body.email,   
         phone: req.body.phone,
-        ownerId: req.user.id,
+        owner: req.user.id,
     }
     try {
         const {error} = updateFavoriteContactShema.validate(contact);
@@ -101,7 +99,7 @@ export const updateFavoritContact = async (req, res, next)  => {
             throw HttpError(400, error.message);
         }; 
         
-        const result = await Contact.findOneAndUpdate({ _id: contactId, ownerId: req.user.id }, contact, { new: true });
+        const result = await Contact.findOneAndUpdate({ _id: req.params.id }, contact, { new: true });
         if(!result) throw HttpError(400, error.message);
       
         res.status(201).send(result);
