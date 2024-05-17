@@ -6,24 +6,21 @@ import HttpError from '../helpers/HttpError.js';
 
 export const register = async (req, res, next)  => {
     const {email, password} = req.body;
-    const emailToLoverCase = email.emailToLoverCase();
+    const emailToLowerCase = email.toLowerCase();
 
     try {
-        const user = await User.findOne({email: emailToLoverCase})
+        const user = await User.findOne({email: emailToLowerCase})
 
         if(!user) throw HttpError(409, "Email in use");
         
         const passwordHash = await bcrypt.hash(password, 10);
 
-        const { email } = await User.create({
-             email: emailToLoverCase,
+         await User.create({
+             email: emailToLowerCase,
              password: passwordHash
             });        
         res.status(201).json({
-            user: {
-                email,
-                subscription,
-            },
+            user: { email },
         })
     } catch(error){
         next(error);
@@ -32,10 +29,10 @@ export const register = async (req, res, next)  => {
 
 export const login = async (req, res, next)  => {
     const {email, password} = req.body;
-    const emailToLoverCase = email.emailToLoverCase();
+    const emailToLowerCase = email.toLowerCase();
 
     try {
-        const user = await User.findOne({email: emailToLoverCase})
+        const user = await User.findOne({email: emailToLowerCase})
 
         if(!user) throw HttpError(401, "Email or password is wrong");
         
@@ -46,28 +43,24 @@ export const login = async (req, res, next)  => {
             
         const token = jwt.sign({id: user._id }, process.env.JWT_SEKRET )
 
-        res.status(201).json({
-      token,
-      user: {
-        email: user.email,
-        subscription: user.subscription,
-      },
-    });;
+        res.status(201).json({ token });
     } catch(error){
         next(error);
     }
 };
 export const current = async (req,res) => {
-    const {email, password} = req.user;
-    res.json({email, subscription});
-};
-
-export const logout = async (req, res, next)  => {
-   
     try {
-        const user = await User.findbyIdAndUpdate(req.user.id, { token: null });
-        res.status(204).end();
+        const email = req.user ? req.user.email : null;
+        res.json({ email });
     } catch(error){
         next(error);
     }
+};
+
+export const logout = async (req, res)  => {
+   const { id } = req.user;
+
+    await User.findByIdAndUpdate(id, { token: null });
+    res.status(204).end();
+    
 };
