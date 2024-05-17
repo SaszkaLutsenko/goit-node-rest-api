@@ -16,7 +16,7 @@ const jsonParses = express.json();
 userRouter.post("/register", validateBody(userShema), jsonParses, register);
 userRouter.post("/login", validateBody(userShema), jsonParses, login);
 userRouter.post("/logout", authMiddleware, logout);
-userRouter.post("/current", authMiddleware, current);
+userRouter.get("/current", authMiddleware, current);
 
 
 export default userRouter;
