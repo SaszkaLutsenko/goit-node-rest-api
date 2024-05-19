@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/users.js';
 import HttpError from '../helpers/HttpError.js';
 
+
 const auth = (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
 
@@ -30,9 +31,12 @@ const auth = (req, res, next) => {
             req.user = user;
             next();
         } catch(error) {
-            next(error);
+            next(HttpError(401));
         }
     });
 };
 
 export default auth;
+
+
+
