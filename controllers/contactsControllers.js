@@ -1,12 +1,12 @@
 
 import HttpError from "../helpers/HttpError.js"
-import { Contact, createContactSchema, updateContactSchema, updateFavoriteContactShema } from "../models/contact.js";
-
+import { createContactSchema, updateContactSchema, updateFavoriteContactShema } from "../models/contact.js";
+import { listContacts, getContactById, removeContact, addContact, updContact } from "../services/contactsServices.js"
 
 export const getAllContacts = async (req, res, next ) => {
     try {
         
-        const contact = await Contact.find({owner: req.user.id});
+        const contact = await listContacts({owner: req.user.id});
 
         if (!contact) throw HttpError(404);
 
@@ -19,8 +19,10 @@ export const getAllContacts = async (req, res, next ) => {
 
 export const getOneContact = async (req, res, next) => {
     try {
+        const {id} = req.params;
+        const {_id: owner } = req.user;
    
-        const contact = await Contact.findOne({_id: req.params.id, owner: req.user.id});
+        const contact = await getContactById({id, owner});
 
         if(!contact) throw HttpError(404, "Not found");
         
@@ -33,8 +35,10 @@ export const getOneContact = async (req, res, next) => {
 
 export const deleteContact = async (req, res, next) => {
     try {
+        const {id} = req.params;
+        const {_id: owner } = req.user;
        
-        const contact = await Contact.findOneAndDelete({_id: req.params.id, owner: req.user.id})
+        const contact = await removeContact({id, owner})
 
     if(!contact) throw HttpError(404, "Not found");
 
@@ -45,17 +49,12 @@ export const deleteContact = async (req, res, next) => {
 };
 
 export const createContact = async (req, res, next) => {
-    const contact = {
-        name: req.body.name,
-        email: req.body.email,   
-        phone: req.body.phone,
-        owner: req.user.id,
-    }
+    
     try {
-        const {error} = createContactSchema.validate(contact);
+        const {error} = createContactSchema.validate(req.body);
         if(error) throw HttpError(400, error.message);
         
-        const result = await Contact.create({contact});
+        const result = await addContact({...req.body, owner: req.user._id});
         res.status(201).send(result);
     } catch(error){
         next(error);
@@ -64,18 +63,14 @@ export const createContact = async (req, res, next) => {
 
 export const updateContact = async (req, res, next)  => {
     
-    const contact = {
-        name: req.body.name,
-        email: req.body.email,   
-        phone: req.body.phone,
-        owner: req.user.id,
-    }
+    const {id} = req.params;
+    const {_id: owner } = req.user;
     try {
-        const {error} = updateContactSchema.validate(contact);
+        const {error} = updateContactSchema.validate(req.body);
         if(error) throw HttpError(400, error.message);
         
         
-        const result = await Contact.findOneAndUpdate({ _id: req.params.id }, contact, { new: true });
+        const result = await updContact(id, owner, req.body, { new: true });
         if(!result) throw HttpError(400, error.message);
       
         
@@ -87,19 +82,15 @@ export const updateContact = async (req, res, next)  => {
 
 export const updateFavoritContact = async (req, res, next)  => {
    
-    const contact = {
-        name: req.body.name,
-        email: req.body.email,   
-        phone: req.body.phone,
-        owner: req.user.id,
-    }
+    const {id} = req.params;
+    const {_id: owner } = req.user;
     try {
-        const {error} = updateFavoriteContactShema.validate(contact);
+        const {error} = updateFavoriteContactShema.validate(req.body);
         if(error){
             throw HttpError(400, error.message);
         }; 
         
-        const result = await Contact.findOneAndUpdate({ _id: req.params.id }, contact, { new: true });
+        const result = await updContact(id, owner, req.body, { new: true });
         if(!result) throw HttpError(400, error.message);
       
         res.status(201).send(result);

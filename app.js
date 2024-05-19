@@ -7,8 +7,11 @@ import contactsRouter from "./routes/contactsRouters.js";
 import userRouter from './routes/auth.js';
 import authMiddleware from "./middleware/auth.js";
 import "./db/db.js";
+import avatarRouter from './routes/users.js';
+import path from "node:path";
 
 const app = express();
+app.use("/avatars", express.static(path.resolve("public/avatars")))
 
 app.use(morgan("tiny"));
 app.use(cors());
@@ -16,6 +19,7 @@ app.use(express.json());
 
 app.use("/api/contacts", authMiddleware, contactsRouter);
 app.use("/users", userRouter);
+app.use("/avatar", authMiddleware, avatarRouter);
 
 const DB_URI = process.env.DB_URI;
 
