@@ -28,7 +28,7 @@ const auth = (req, res, next) => {
             }
 
             req.user = user;
-            next();
+            next(HttpError(401));
         } catch(error) {
             next(error);
         }
