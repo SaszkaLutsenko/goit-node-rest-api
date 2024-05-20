@@ -4,7 +4,7 @@ import { listContacts, getContactById, removeContact, addContact, updContact } f
 
 export const getAllContacts = async (req, res, next) => {
     try {
-        const contacts = await listContacts({ owner: req.user.id });
+        const contacts = await listContacts();
 
         if (!contacts.length) throw HttpError(404, "Contacts not found");
 
@@ -65,7 +65,7 @@ export const updateContact = async (req, res, next) => {
         const { error } = updateContactSchema.validate(req.body);
         if (error) throw HttpError(400, error.message);
 
-        const result = await updContact(id, owner, req.body, { new: true });
+        const result = await updContact(id, owner, req.body);
         if (!result) throw HttpError(404, "Not found");
 
         res.status(200).json(result);
@@ -82,7 +82,7 @@ export const updateFavoriteContact = async (req, res, next) => {
         const { error } = updateFavoriteContactShema.validate(req.body);
         if (error) throw HttpError(400, error.message);
 
-        const result = await updContact(id, owner, req.body, { new: true });
+        const result = await updContact(id, owner, req.body);
         if (!result) throw HttpError(404, "Not found");
 
         res.status(200).json(result);
