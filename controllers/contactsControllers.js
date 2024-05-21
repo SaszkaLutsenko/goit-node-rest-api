@@ -6,7 +6,7 @@ import { listContacts, getContactById, removeContact, addContact, updContact } f
 export const getAllContacts = async (req, res, next ) => {
     try {
         
-        const contact = await listContacts({owner: req.user.id});
+        const contact = await listContacts();
 
         if (!contact) throw HttpError(404);
 
@@ -70,7 +70,7 @@ export const updateContact = async (req, res, next)  => {
         if(error) throw HttpError(400, error.message);
         
         
-        const result = await updContact(id, owner, req.body, { new: true });
+        const result = await updContact(id, owner, req.body);
         if(!result) throw HttpError(400, error.message);
       
         
@@ -90,7 +90,7 @@ export const updateFavoritContact = async (req, res, next)  => {
             throw HttpError(400, error.message);
         }; 
         
-        const result = await updContact(id, owner, req.body, { new: true });
+        const result = await updContact(id, owner, req.body);
         if(!result) throw HttpError(400, error.message);
       
         res.status(201).send(result);

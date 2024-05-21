@@ -23,7 +23,7 @@ const userShema = new mongoose.Schema(
         },
         avatarURL: {
           type: String,
-          default: null,
+          required: true,
         }
       }
 );
