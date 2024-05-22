@@ -7,6 +7,8 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import Jimp from 'jimp';
 
+const avatarDir = path.join(__dirname, '../', 'public', 'avatars');
+
 
 export const register = async (req, res, next) => {
     try {
@@ -15,12 +17,10 @@ export const register = async (req, res, next) => {
 
         const user = await User.findOne({ email: emailToLowerCase });
 
-        if (user !== null) {
-            throw HttpError(409, "Email in use");
-        }
+        if (user) throw HttpError(409, "Email in use");
 
         const passwordHash = await bcrypt.hash(password, 10);
-        const avatarURL = gravatar.url(email);
+        const avatarURL = gravatar.url(email, { s: "250", r: "pg", d: "mm" }, true);
 
         const newUser = await User.create({
             email: emailToLowerCase,
@@ -43,16 +43,12 @@ export const login = async (req, res, next) => {
 
         const user = await User.findOne({ email: emailToLowerCase });
 
-        if (user === null) {
-            throw HttpError(401, "Email or password is wrong");
-        }
-
+        if (user === null) throw HttpError(401, "Email or password is wrong");
+    
         const isMatch = await bcrypt.compare(password, user.password);
 
-        if (!isMatch) {
-            throw HttpError(401, "Email or password is wrong");
-        }
-
+        if (!isMatch) throw HttpError(401, "Email or password is wrong");
+        
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
         await User.findOneAndUpdate({ email }, { token });
@@ -112,10 +108,12 @@ export const getAvatar = async (req, res, next) => {
     }
 };
 
-const avatarDir = path.join(__dirname, '../', 'public', 'avatars');
-
 export const updateAvatar = async (req, res, next) => {
     try {
+         if (!req.user) throw HttpError(401, "Not authorized");
+
+         if(!req.file) throw HttpError(400, "File not provided");
+
         const { _id } = req.user;
         const { path: tmpUpload, originalname } = req.file;
         const avatarName = `${_id}_${originalname}`;
@@ -124,14 +122,13 @@ export const updateAvatar = async (req, res, next) => {
         const image = await Jimp.read(tmpUpload);
         await image.resize(250, 250).writeAsync(resultUpload);
 
-        await fs.unlink(tmpUpload);
+        await fs.rename(tmpUpload, resultUpload);
 
         const avatarURL = path.join('avatars', avatarName);
-        const user = await User.findOneAndUpdate(_id, { avatarURL }, { new: true });
-        if (user === null) throw HttpError(401, "Not authorized");
+        await User.findOneAndUpdate(_id, { avatarURL }, { new: true });
 
         res.json({
-            avatarURL,
+            avatarURL
         });
     } catch (error) {
         next(error);
