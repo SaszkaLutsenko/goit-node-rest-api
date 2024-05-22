@@ -127,7 +127,8 @@ export const updateAvatar = async (req, res, next) => {
         await fs.unlink(tmpUpload);
 
         const avatarURL = path.join('avatars', avatarName);
-        await User.findOneAndUpdate(_id, { avatarURL }, { new: true });
+        const user = await User.findOneAndUpdate(_id, { avatarURL }, { new: true });
+        if (user === null) throw HttpError(401, "Not authorized");
 
         res.json({
             avatarURL,
