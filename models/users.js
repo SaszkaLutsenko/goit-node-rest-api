@@ -24,6 +24,14 @@ const userShema = new mongoose.Schema(
         avatarURL: {
           type: String,
           required: true,
+        },
+        verify: {
+          type: Boolean,
+          default: false,
+        },
+        verificationToken: {
+          type: String,
+          default: [true, 'Verify token is required'],
         }
       }
 );
@@ -36,7 +44,12 @@ const userSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+const emailSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
 export default {
   User,
   userSchema,
+  emailSchema,
 }
