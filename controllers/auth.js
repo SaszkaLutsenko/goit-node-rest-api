@@ -8,10 +8,9 @@ import fs from 'node:fs/promises';
 import Jimp from 'jimp';
 import { nanoid } from 'nanoid';
 import mail from "../helpers/sendEmail.js"; 
+import createVerificatinEmail from '../helpers/verifyEmail.js';
 
 const avatarDir = path.join(__dirname, '../', 'public', 'avatars');
-const {BASE_URL} = process.env;
-
 
 export const register = async (req, res, next) => {
     try {
@@ -33,15 +32,9 @@ export const register = async (req, res, next) => {
             verificationToken  
         });
 
-        const verify = ({
-            to: emailToLowerCase,
-            from: "contactbook@gmail.com",
-            subject: "welcome to contactbook!",
-            html: `To verify your email please <a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">click</a> here`,
-            text: `To verify your email please open the link ${BASE_URL}/api/users/verify/${verificationToken}`
-        })
+        const verifyEmail = createVerificatinEmail(emailToLowerCase, verificationToken);
 
-        await mail.sendEmail(verify)
+        await mail.sendMail(verifyEmail);
         
         res.status(201).json({
             user: { email, subscribtion: newUser.subscribtion },
@@ -79,17 +72,9 @@ export const resendVerifyEmail = async (req, res, next) => {
         
         if(user.verify) throw HttpError(400, "Verification has already been passed") 
 
-        const verify = ({
-            to: email,
-            from: "contactbook@gmail.com",
-            subject: "welcome to contactbook!",
-            html: `To verify your email please <a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">click</a> here`,
-            text: `To verify your email please open the link ${BASE_URL}/api/users/verify/${verificationToken}`
-        })
+        const verifyEmail = createVerificatinEmail(emailToLowerCase, verificationToken);
 
-        await mail.sendEmail(verify)
-
-
+        await mail.sendMail(verifyEmail);
 
         res.json({
             message: "verify email verify success"  
